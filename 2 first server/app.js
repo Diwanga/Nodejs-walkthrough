@@ -1,6 +1,7 @@
 const http = require('http');
 // import http from 'http';
 const fs = require('fs');
+const { errorMonitor } = require('events');
 
 const server = http.createServer((req, res) => {
 
@@ -23,17 +24,21 @@ const server = http.createServer((req, res) => {
             body.push(chunk);
             console.log(chunk);
         });
-        req.on('end', () => {
+        return req.on('end', () => {
             const parsedbody = Buffer.concat(body).toString();
             console.log(parsedbody);
             reqdata = parsedbody.split("=")[1]
-            fs.writeFileSync("message.txt", reqdata)
+            fs.writeFile("message.txt", reqdata, (err) => {
 
-        })
+                res.statusCode = 302;
+                res.setHeader("Location", "/")   //REDIRECTING
+                return res.end();
 
-        res.statusCode = 302;
-        res.setHeader("Location", "/")   //REDIRECTING
-        return res.end();
+
+            });
+        });
+
+
 
     }
     res.setHeader("Content-type", "text/html");
