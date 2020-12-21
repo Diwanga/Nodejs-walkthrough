@@ -9,7 +9,7 @@ app.use(parser.urlencoded({extended : true}));   //okkomaa req gannawa.   / whic
 app.get('/favicon.ico', (req, res) => res.status(204));
 
 
-app.use(adminRoute);
+app.use('/admin',adminRoute); // req  filtering 
 app.use(shopRoute);
 
 app.use((req,res,next)=>{    // methana thinne "/"   meka default.
