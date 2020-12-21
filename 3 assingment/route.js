@@ -1,3 +1,5 @@
+const { decode } = require("punycode");
+
 var userslist = []
 const reqHandeler = (req, res) => {
 
@@ -13,13 +15,15 @@ const reqHandeler = (req, res) => {
         const body = []
         req.on("data", (chunk) => {
             body.push(chunk);
+            //console.log(chunk.toString())
+
         });
 
         req.on("end", () => {
 
             const parsedbody = Buffer.concat(body).toString();
             const senddata = parsedbody.split("=")[1]
-            // console.log(senddata);
+            //console.log(senddata);
             userslist.push(senddata);
             //  console.log(userslist)
             // res.setHeader("Content-type", "text/html");
@@ -40,7 +44,7 @@ const reqHandeler = (req, res) => {
 
         res.write("<ul>");
         for (user of userslist) {
-            console.log(user);
+            //console.log(user);
             res.write(`<li>${user}</li>`);
         }
         res.write("</ul>");

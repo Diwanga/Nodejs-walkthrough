@@ -1,7 +1,7 @@
 const http = require('http');
 // import http from 'http';
 const fs = require('fs');
-const { errorMonitor } = require('events');
+
 
 const server = http.createServer((req, res) => {
 
@@ -16,6 +16,7 @@ const server = http.createServer((req, res) => {
         res.write('</head>');
         res.write('</head>');
         res.write('</html>');
+
         return res.end();
     }
     if (url === "/message" && method === "POST") {

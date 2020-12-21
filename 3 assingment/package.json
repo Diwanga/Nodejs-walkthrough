@@ -1,0 +1,13 @@
+{
+  "name": "3-assingment",
+  "version": "1.0.0",
+  "description": "run node app with scripts",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "start-server": "node app.js"
+  },
+  "author": "Diwanga Amsith",
+  "license": "ISC"
+}
