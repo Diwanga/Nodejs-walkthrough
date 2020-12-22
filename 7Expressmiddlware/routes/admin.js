@@ -2,6 +2,9 @@ const express = require("express");
 
 const route = express.Router();
 
+
+
+
 route.post('/add-product',(req,res,next)=>{   //use wenuwata apita get post put delete pawihh krala req filter karanna puluwan
 
     console.log("middleware /users");
