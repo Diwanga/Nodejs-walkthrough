@@ -4,7 +4,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const app = express();
-app.set("view engine",'pug');
+// app.set("view engine",'pug');
+// app.set('views','views');//this is defalt. nt need
+app.set("view engine",'ejs');
 app.set('views','views');//this is defalt. nt need
 
 const adminData = require('./routes/admin');
@@ -19,7 +21,7 @@ app.use(shopRoutes);
  
 app.use((req, res, next) => {   //default tinn '/'
     // res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
-    res.status(404).render('404',{docTitle : "Page not found"})
+    res.status(404).render('404',{docTitle : "Page not found pro ejs"})
 });
 
 app.listen(3000);
