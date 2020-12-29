@@ -19,13 +19,16 @@ exports.getadminpoducts = (req, res, next) => {
   };
 
   exports.getshopprroducts = (req, res, next) => {
-   
-    res.render('shop', {
-      prods: Product.fetchall(),
-      pageTitle: 'Shop',
-      path: '/',
-      hasProducts: Product.fetchall().length > 0,
-      activeShop: true,
-      productCSS: true
+    // const products = Product.fetchall()    this will not use async
+    Product.fetchall((products)=>{ //annonymous function which is called after the fetchall done
+      res.render('shop', {
+        prods: products,
+        pageTitle: 'Shop',
+        path: '/',
+        hasProducts: products.length > 0,
+        activeShop: true,
+        productCSS: true
+      });
+      
     });
   };
