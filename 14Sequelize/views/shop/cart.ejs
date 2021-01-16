@@ -11,9 +11,10 @@
             <%for(productdetails of cartitems){%>
                 
                 <li>
-                   <p><%=productdetails.product.title%> (<%=productdetails.qty%>)</p> 
+                   <p><%=productdetails.title%> </p> 
+                   <h1><%=productdetails.cartItem.quantity%></h1>
                    <form action="/cart-delete-item" method="post">
-                    <input type="hidden" name="productId" value="<%=productdetails.product.id%>">
+                    <input type="hidden" name="productId" value="<%=productdetails.id%>">
                     <button type="submit">Delete</button>
                 
                 </form>

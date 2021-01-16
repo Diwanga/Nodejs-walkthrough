@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const User = require('../models/user');
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -14,12 +15,11 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  Product.create({
+  req.user.createProduct({ // magic assosiation by seqalize  // den req.user.id ona ne
     title : title,
     price : price,
     description : description,
-    imageUrl : imageUrl
-
+    imageUrl : imageUrl,
   }).then(result =>{
     console.log(result);
     res.redirect('/')
@@ -28,6 +28,23 @@ exports.postAddProduct = (req, res, next) => {
     console.log(err);
   }
   );
+//magin assosiation nowana widiyanowana widiya
+  // Product.create({
+  //   title : title,
+  //   price : price,
+  //   description : description,
+  //   imageUrl : imageUrl,
+  //   userId : req.user.id
+
+
+  // }).then(result =>{
+  //   console.log(result);
+  //   res.redirect('/')
+  // })
+  // .catch(err =>{
+  //   console.log(err);
+  // }
+  // );
 
  // const product = new Product(null,title, imageUrl, description, price);
   
@@ -55,12 +72,17 @@ exports.postAddProduct = (req, res, next) => {
 exports.getEditProduct = (req, res, next) => {
    const editMode =req.query.edit; //here it as string. so true false null all are the as string or true logically
    console.log(editMode);
-   if(!editMode){
+   if(!`editMode`){
      return res.redirect('/');
    }else{
     const prodid = req.params.productId;
-    console.log(prodid);
-    Product.findbyid(prodid,product=>{
+    // console.log(prodid);
+    req.user.getProducts({where : {id:prodid}}) // magic method // meken enne array ekak
+    // Product.findByPk(prodid) ////////////// me magin method ekata kalin widiya
+
+    .then(product=>{
+      console.log("Edite product details");
+      console.log(product);
       if(!product){
         return res.redirect('/');
       }
@@ -69,7 +91,7 @@ exports.getEditProduct = (req, res, next) => {
         pageTitle: 'Edit Product',
         path: '/admin/edit-product',
         editing: editMode,
-        product : product
+        product : product[0] // magic deno nm [0] ona . findbypk walin nm enne ekai nisa on ne
 
     })
        
@@ -84,33 +106,74 @@ exports.postEditProduct = (req,res,next) =>{
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(id,title, imageUrl, description, price);
+  // const product = new Product(id,title, imageUrl, description, price);
  
-  product.save();
-  res.redirect('/admin/products');
+//max widiya
+Product.findByPk(id).then(
+  product =>{
+    product.title = title;
+    product.price = price;
+    product.description = description;
+    product.imageUrl = imageUrl;
+    return product.save() ;  /// meken db eke id thina row eka knethnm eka hadala hari danawa
+  }
+).then(result=>{ // me save promis eke
+        console.log(result)
+      res.redirect('/admin/products');
+})
+.catch(err =>{
+  console.log(err);  // methna promis 2kema ewa allanawa
+});
+
+
+
+
+
+  //mage widiya
+  // Product.update(
+  //   { title: title,
+  //    price :price,
+  //    description:description,
+  //    imageUrl:imageUrl },
+  //   { where: { id: id } }
+  // )
+  //   .then(result =>{
+      
+  //     console.log(result)
+  //     res.redirect('/admin/products');
+  //   }
+  //   )
+  //   .catch(err =>{
+
+  //     console.log(err);
+  //   }
+  //   );
 
 }
 
 
 exports.postDeleteProduct = (req,res,next)=>{
   const deleteid = req.body.productId;
-  
-  console.log(deleteid);
+  Product.findByPk(deleteid).then(
+product =>{
+return product.destroy();
+}
 
-  if(deleteid){
-    Product.deleteproduct(deleteid);
-    
-  }else{
-    console.log("NO ID COME TO DELLETE");
-  }
+  ).then(result=>{
+    res.redirect('/admin/products');
 
-  res.redirect('/admin/products');
+  }).catch(err=>{
+    console.log(err);
+  });
+
 
 
 }
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll().then(
+  req.user.getProducts() //magic
+  // Product.findAll()  before magic
+  .then(
     products => {
     res.render('admin/products', {
       prods: products,

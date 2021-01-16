@@ -66,55 +66,101 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  Cart.getCartitems((cartitems) => {
-    console.log(cartitems);
-    if (cartitems.products.length == 0) {
-      res.render("shop/cart", {
-        path: "/cart",
-        pageTitle: "Your Cart",
-        cartitems: [],
-      });
-    } else {
-      Product.fetchAll((products) => {
-        const cartdeetils = [];
-
-        for (product of products) {
-          cartprodutdata = cartitems.products.find(
-            (prod) => prod.id === product.id
-          );
-
-          if (cartprodutdata) {
-            cartdeetils.push({ product: product, qty: cartprodutdata.qty });
-          }
-        }
-
-        res.render("shop/cart", {
-          path: "/cart",
-          pageTitle: "Your Cart",
-          cartitems: cartdeetils,
-        });
-      });
+ req.user
+ .getCart()
+ .then(cart =>{
+  return cart.getProducts().then(products=>{
+   // console.log("menna ena cart item data eka product wise  "+products[0].cartItem.quantity);
+    res.render("shop/cart", {
+      cartitems: products,
+      pageTitle: "cart",
+      path: "/",
     }
-  });
+  )
+ })
+ .catch();
+}
+ )
 };
+
 exports.postCart = (req, res, next) => {
   const prodid = req.body.productid;
-  Product.findbyid(req.body.productid, (product) => {
-    Cart.addproduct(prodid, product.price);
-  });
+  let fetchcart; // to avaible in all pomises
+  let newquantity = 1; // to avaible in all below pomises
+req.user.getCart()
 
+.then(cart =>{
+  fetchcart = cart;
+  return cart.getProducts({where:{id:prodid}})
+})
+.then(products=>{
+  let product
+  if(products.length >0){
+    product = products[0]
+  }
+  
+  if(product){ // thiye nm undefine neee
+    const oldquentity = product.cartItem.quantity;
+    newquantity = oldquentity+1;
+    return product;
+    
+  }
+   return Product.findByPk(prodid) // for new product adding
+  
+   
+})
+.then(product=>{
+  return fetchcart.addProduct(product,{through : {quantity:newquantity}}) //throug dana thawath thenak(thawa colum ekakata)
+}).then(()=>{
   // console.log("ADDED TO CART"+ cartitem);
   res.redirect("/cart");
+})
+.catch(err=>{
+  conssole.log(err);
+});
+
+  
 };
 
 exports.deletecartitem = (req, res, next) => {
   const prodid = req.body.productId;
-  console.log(prodid);
-  Product.findbyid(prodid, (product) => {
-    Cart.deletefromcart(prodid, product.price); // apita meka iissarahoin price gennanth  aki. but all data retrival backed eke thiyagamu
-    res.redirect("/cart");
-  });
+  console.log("skajdhhhhhhhhhhhhhhhhhhh  "+prodid);
+  req.user.getCart()
+  .then(cart =>{
+return cart.removeProducts(prodid)
+
+  }).then(()=>{
+    res.redirect("/cart")
+  })
+  .catch(err=>{
+
+    console.log(err)
+  })
 };
+//max widiya
+// exports.deletecartitem = (req, res, next) => {
+//   const prodid = req.body.productId;
+//   console.log("skajdhhhhhhhhhhhhhhhhhhh  "+prodid);
+//   req.user.getCart()
+//   .then(cart =>{
+// return cart.getProducts({where:{id:prodid}})
+
+//   }).then(products=>{
+//     const product = products[0]
+//     return product.cartItem.destroy();
+//   }).then(()=>{
+//     res.redirect("/cart")
+//   })
+//   .catch(err=>{
+
+//     console.log(err)
+//   })
+// };
+
+
+
+
+
 
 exports.getOrders = (req, res, next) => {
   res.render("shop/orders", {
