@@ -109,7 +109,7 @@ exports.postSignup = (req, res, next) => {
         .catch(err => {
           console.log(err);
         });
-        
+
     })
     .catch(err => {
       console.log(err);
@@ -151,7 +151,7 @@ exports.postReset = (req, res, next) => {
           return res.redirect('/reset');
         }
         user.resetToken = token;
-        user.resetTokenExpiration = Date.now() + 3600000;
+        user.resetTokenExpiration = Date.now() + 3600000; // save token in user 
         return user.save();
       })
       .then(result => {
@@ -159,10 +159,10 @@ exports.postReset = (req, res, next) => {
         transporter.sendMail({
           to: req.body.email,
           from: 'shop@node-complete.com',
-          subject: 'Password reset',
+          subject: 'Password reset',   // token sequrity
           html: `
             <p>You requested a password reset</p>
-            <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password.</p>
+            <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password.</p> 
           `
         });
       })
@@ -174,7 +174,7 @@ exports.postReset = (req, res, next) => {
 
 exports.getNewPassword = (req, res, next) => {
   const token = req.params.token;
-  User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } })
+  User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } }) // tojken eka kal ikuth welada
     .then(user => {
       let message = req.flash('error');
       if (message.length > 0) {
@@ -197,7 +197,7 @@ exports.getNewPassword = (req, res, next) => {
 
 exports.postNewPassword = (req, res, next) => {
   const newPassword = req.body.password;
-  const userId = req.body.userId;
+  const userId = req.body.userId; // yawapu user id
   const passwordToken = req.body.passwordToken;
   let resetUser;
 
